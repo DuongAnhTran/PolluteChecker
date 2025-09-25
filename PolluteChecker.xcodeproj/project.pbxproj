@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		93CF0D882E8507D60008FC9D /* OpenMeteoSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 93CF0D872E8507D60008FC9D /* OpenMeteoSdk */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		939FF33D2E850757008BE5F7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93CF0D882E8507D60008FC9D /* OpenMeteoSdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = PolluteChecker;
 			packageProductDependencies = (
+				93CF0D872E8507D60008FC9D /* OpenMeteoSdk */,
 			);
 			productName = PolluteChecker;
 			productReference = 939FF32F2E850756008BE5F7 /* PolluteChecker.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 939FF3262E850756008BE5F7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				93CF0D862E8507D60008FC9D /* XCRemoteSwiftPackageReference "sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 939FF3302E850756008BE5F7 /* Products */;
 			projectDirPath = "";
@@ -605,6 +614,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		93CF0D862E8507D60008FC9D /* XCRemoteSwiftPackageReference "sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-meteo/sdk.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		93CF0D872E8507D60008FC9D /* OpenMeteoSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 93CF0D862E8507D60008FC9D /* XCRemoteSwiftPackageReference "sdk" */;
+			productName = OpenMeteoSdk;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 939FF3272E850756008BE5F7 /* Project object */;
 }
