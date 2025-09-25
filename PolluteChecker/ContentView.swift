@@ -18,11 +18,11 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("Hello, world!")
         }
-        .task{
-            let object = await apiFetch.fetchAirQuality(latitude: -33.8678, longitude: 151.2073)
-            print(object.hourly.ozone)
-            print(object.hourly.time)
-        }
+//        .task{
+//            let object = await apiFetch.fetchAirQuality(latitude: -33.8678, longitude: 151.2073)
+//            print(object.hourly.ozone)
+//            print(object.hourly.time)
+//        }
         //.padding()
     }
 }

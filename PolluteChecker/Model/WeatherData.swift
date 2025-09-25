@@ -7,6 +7,8 @@
 
 import Foundation
 
+
+// Weather data model to receive air quality data from open-meteo import
 struct WeatherData: Codable, Identifiable {
     let hourly: Hourly
     var id = UUID()
