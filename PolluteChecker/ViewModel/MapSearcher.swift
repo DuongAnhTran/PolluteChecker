@@ -13,7 +13,14 @@ import _MapKit_SwiftUI
 
 
 class MapSearcher: ObservableObject {
-    @Published var cameraPosition: MapCameraPosition = .automatic
+    @Published var camPos: MapCameraPosition = .region(
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: -33.8688, longitude: 151.2093),
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        )
+    )
+    
+    
     @Published var locationPin: LocationPin? = nil
 
     func locationSearch(query: String) {
@@ -22,11 +29,10 @@ class MapSearcher: ObservableObject {
 
         let search = MKLocalSearch(request: request)
         search.start { response, error in
-            guard let coordinate = response?.mapItems.first?.location.coordinate else { return }
+            guard let coordinate = response?.mapItems.first?.placemark.coordinate else { return }
             DispatchQueue.main.async {
                 self.locationPin = LocationPin(coordinate: coordinate)
-                let camera = MapCamera(centerCoordinate: coordinate, distance: 1000)
-                self.cameraPosition = .camera(camera)
+                self.camPos = .camera(MapCamera(centerCoordinate: coordinate, distance: 1000))
             }
         }
     }

@@ -14,6 +14,7 @@ import MapKit
 struct MapView: View {
     @StateObject private var mapSearch = MapSearcher()
     @State private var queryText = ""
+    @State private var locSelect: Bool = false
     
     var body: some View {
         VStack {
@@ -22,15 +23,18 @@ struct MapView: View {
             })
             .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            Map(position: $mapSearch.cameraPosition) {
+            Map(position: $mapSearch.camPos) {
                 if let pin = mapSearch.locationPin {
-                    Annotation("", coordinate: pin.coordinate) {
+                    Annotation("Destination", coordinate:pin.coordinate) {
                         Button(action: {
-                            //gotta add a pop up sheet or sth
+                            locSelect = true
                         }) {
                             Image(systemName: "mappin.circle.fill")
                                 .font(.title)
                                 .foregroundStyle(.red)
+                        }
+                        .sheet(isPresented: $locSelect) {
+                            LocationView()
                         }
                     }
                 }
