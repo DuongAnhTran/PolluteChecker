@@ -9,7 +9,12 @@ import Foundation
 import SwiftUI
 
 struct LocationView: View {
+    @StateObject var fetcher = APIFetcher()
+    @State var lat: Double
+    @State var lon: Double
+    
     var body: some View {
-        Text("Location View")
+        Text("\(lat)")
+        Text("\(lon)")
     }
 }

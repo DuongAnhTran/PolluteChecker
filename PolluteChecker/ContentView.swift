@@ -9,24 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var apiFetch = APIFetcher()
-    
+    @EnvironmentObject var locationManager: LocationManager
     
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            MapView().environmentObject(locationManager)
+                .tabItem {
+                    Label("Map", systemImage: "map")
+                }
+            
+            SavedLocation()
+            
         }
-//        .task{
-//            let object = await apiFetch.fetchAirQuality(latitude: -33.8678, longitude: 151.2073)
-//            print(object.hourly.ozone)
-//            print(object.hourly.time)
-//        }
-        //.padding()
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(LocationManager())
 }
