@@ -14,6 +14,9 @@ import MapKit
 struct MapView: View {
     @StateObject private var mapSearch = MapSearcher()
     @State private var queryText = ""
+    @State private var queryLat = ""
+    @State private var queryLon = ""
+    @State private var queryCity = ""
     @State private var locSelect: Bool = false
     @State private var selectedCat: SearchCategory = .randomQuery
     
@@ -21,12 +24,32 @@ struct MapView: View {
         VStack {
             switch selectedCat {
                 case .randomQuery:
-                    TextField("Search for location", text: $queryText, onCommit: {
-                        mapSearch.locationSearch(query: queryText)
-                        mapSearch.isInitial = false
-                    })
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    HStack {
+                        TextField("Enter location query", text: $queryText, onCommit: {
+                            mapSearch.locationSearch(query: queryText)
+                            mapSearch.isInitial = false
+                        })
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
+                        Button(action: {
+                            mapSearch.locationSearch(query: queryText)
+                            mapSearch.isInitial = false
+                        }) {
+                            HStack {
+                                Text("Search")
+                                Image(systemName: "magnifyingglass.circle")
+                            }
+                            .padding(5)
+                        }
+                        .foregroundStyle(.white)
+                        .background(.blue)
+                        .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 5)
                     
+                    SearchPickerView(selectedCat: $selectedCat)
+
                     Map(position: $mapSearch.camPos) {
                         if let pin = mapSearch.locationPin {
                             Annotation("Destination", coordinate:pin.coordinate) {
@@ -50,6 +73,19 @@ struct MapView: View {
                 
                 case .cities:
                     // View for city search
+                    
+                    SearchPickerView(selectedCat: $selectedCat)
+                    Text("WIP")
+                
+                case .coordination:
+                    //View for coordinate search
+                HStack {
+                    TextField("Enter latitude", text: $queryLat)
+                    TextField("Enter longitude", text: $queryLon)
+                    //Button
+                }
+                    
+                    SearchPickerView(selectedCat: $selectedCat)
                     Text("WIP")
                 
                 
@@ -66,6 +102,7 @@ struct MapView: View {
 enum SearchCategory: String, CaseIterable, Identifiable {
     case randomQuery = "Query"
     case cities = "Cities"
+    case coordination = "Coordinate"
     
     //Just giving a readable string as id for each case - conforming Identifiable
     var id: String { rawValue }

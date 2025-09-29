@@ -32,6 +32,8 @@ class LocationManager: ObservableObject {
             let decoder = JSONDecoder()
             if let decodeData = try? decoder.decode([LocationData].self, from: data as! Data)  {
                 self.locationList = decodeData
+            } else {
+                self.locationList = []
             }
         }
     }

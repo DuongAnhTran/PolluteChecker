@@ -15,18 +15,18 @@ class APIFetcher: ObservableObject {
     @Published var weatherData: WeatherData = .empty
     
     
-    func fetchAirQuality(latitude: Double, longitude: Double) async -> WeatherData{
-        guard let url = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=\(latitude)&longitude=\(longitude)&hourly=carbon_monoxide,carbon_dioxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust&forecast_days=1&format=flatbuffers") else { return .empty }
+    func fetchAirQuality(latitude: Double, longitude: Double) async {
+        guard let url = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=\(latitude)&longitude=\(longitude)&hourly=carbon_monoxide,carbon_dioxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust&timezone=auto&forecast_days=1&format=flatbuffers") else { return }
         
         let responses = try? await WeatherApiResponse.fetch(url: url)
         
-        guard let response = responses?.first else { return .empty }
+        guard let response = responses?.first else { return }
         
-        guard let hourly = response.hourly else { return .empty }
+        guard let hourly = response.hourly else { return }
         
         let offset = response.utcOffsetSeconds
         
-        return WeatherData(
+        weatherData = WeatherData(
             hourly: .init(
                 time: hourly.getDateTime(offset: offset),
                 carbonMonoxide: hourly.variables(at: 0)?.values ?? [],

@@ -26,7 +26,9 @@ class MapSearcher: ObservableObject {
 
     
     func getCurrentLocation() {
-        CLLocationManager().requestWhenInUseAuthorization()
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            CLLocationManager().requestWhenInUseAuthorization()
+        }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let coordinate = CLLocationManager().location?.coordinate {

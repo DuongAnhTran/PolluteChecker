@@ -10,7 +10,20 @@ import SwiftUI
 import Foundation
 
 struct SavedLocation: View {
+    @StateObject var manager = LocationManager()
+    
     var body: some View {
-        Text("hello")
+        Text("\(manager.locationList.count)")
+            .onAppear {
+                Task {
+                    manager.loadLocation()
+                    print("\(manager.locationList.count)")
+                }
+            }
     }
+    
+}
+
+#Preview {
+    SavedLocation(manager: LocationManager())
 }
