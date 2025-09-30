@@ -16,7 +16,7 @@ class APIFetcher: ObservableObject {
     
     
     func fetchAirQuality(latitude: Double, longitude: Double) async {
-        guard let url = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=\(latitude)&longitude=\(longitude)&hourly=carbon_monoxide,carbon_dioxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust&timezone=auto&forecast_days=1&format=flatbuffers") else { return }
+        guard let url = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=\(latitude)&longitude=\(longitude)&hourly=pm2_5,carbon_monoxide,carbon_dioxide,nitrogen_dioxide,sulphur_dioxide,ozone,pm10&timezone=auto&forecast_days=1&format=flatbuffers") else { return }
         
         let responses = try? await WeatherApiResponse.fetch(url: url)
         
@@ -29,12 +29,13 @@ class APIFetcher: ObservableObject {
         weatherData = WeatherData(
             hourly: .init(
                 time: hourly.getDateTime(offset: offset),
-                carbonMonoxide: hourly.variables(at: 0)?.values ?? [],
-                carbonDioxide: hourly.variables(at: 1)?.values ?? [],
-                nitrogenDioxide: hourly.variables(at: 2)?.values ?? [],
-                sulphurDioxide: hourly.variables(at: 3)?.values ?? [],
-                ozone: hourly.variables(at: 4)?.values ?? [],
-                dust: hourly.variables(at: 5)?.values ?? []
+                pm25: hourly.variables(at: 0)?.values ?? [],
+                carbonMonoxide: hourly.variables(at: 1)?.values ?? [],
+                carbonDioxide: hourly.variables(at: 2)?.values ?? [],
+                nitrogenDioxide: hourly.variables(at: 3)?.values ?? [],
+                sulphurDioxide: hourly.variables(at: 4)?.values ?? [],
+                ozone: hourly.variables(at: 5)?.values ?? [],
+                pm10: hourly.variables(at: 6)?.values ?? []
             )
         )
         

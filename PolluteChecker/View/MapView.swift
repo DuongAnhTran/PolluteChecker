@@ -61,8 +61,11 @@ struct MapView: View {
                                         .foregroundStyle(mapSearch.isInitial ? .blue : .red)
                                 }
                                 .sheet(isPresented: $locSelect) {
-                                    LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude)
-                                        .presentationDragIndicator(.visible)
+                                    NavigationStack {
+                                        LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude)
+                                            .presentationDragIndicator(.visible)
+                                    }
+                                    
                                 }
                                 
                             }

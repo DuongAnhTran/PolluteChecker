@@ -13,6 +13,7 @@ struct GraphView: View {
     let label: String
     let dateArray: [Date]
     let valueArray: [Float]
+    let color: Color
     
     
     var body: some View {
@@ -25,6 +26,7 @@ struct GraphView: View {
                 y: .value(label, point.value)
             )
         }
+        .foregroundStyle(color)
         .chartXAxis {
             AxisMarks(preset: .aligned) { _ in
                 AxisGridLine()
