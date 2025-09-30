@@ -1,5 +1,5 @@
 //
-//  LocationManager.swift
+//  LocationCacher.swift
 //  PolluteChecker
 //
 //  Created by Dương Anh Trần on 28/9/2025.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-class LocationManager: ObservableObject {
+class LocationCacher: ObservableObject {
     @Published var locationList: [LocationData] = []
     
     

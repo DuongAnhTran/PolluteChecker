@@ -21,16 +21,15 @@ class MapSearcher: ObservableObject {
         )
     )
     @Published var isInitial: Bool = true
-    @Published var cityList: [CityResult] = []
     @Published var locationPin: LocationPin? = nil
 
     
     func getCurrentLocation() {
-        if CLLocationManager.authorizationStatus() == .notDetermined {
+        if CLLocationManager().authorizationStatus == .notDetermined {
             CLLocationManager().requestWhenInUseAuthorization()
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             if let coordinate = CLLocationManager().location?.coordinate {
                 self.camPos = .camera(MapCamera(centerCoordinate: coordinate, distance: 1000))
                 self.locationPin = LocationPin(coordinate: coordinate)
@@ -40,6 +39,8 @@ class MapSearcher: ObservableObject {
         }
     }
     
+    
+    //Search using random query, might need specific prompt and information to find exact thing (will return the most relevant result)
     func locationSearch(query: String) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = query
@@ -54,30 +55,15 @@ class MapSearcher: ObservableObject {
         }
     }
     
-    func citySearch(query: String) {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = query
-        
-        let search = MKLocalSearch(request: request)
-        search.start { response, error in
-            guard let cities = response?.mapItems else { return }
-            
-            let results = cities.compactMap { city -> CityResult? in
-                let coordinate = city.placemark.coordinate
-                let name = city.name ?? "Unknown"
-                let country = city.placemark.country ?? "Unknown"
-                return CityResult(
-                    cityName: name,
-                    country: country,
-                    lat: coordinate.latitude,
-                    lon: coordinate.longitude
-                )
-            }
-            
-            DispatchQueue.main.async {
-                self.cityList = results
-            }
+    
+    
+    //Search function when using lat and lon
+    func coorSearch(lat: String, lon: String) {
+        guard let lat = Double(lat), let lon = Double(lon) else {
+            return
         }
+        self.locationPin = LocationPin(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon))
+        self.camPos = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon), distance: 1000))
     }
     
 }

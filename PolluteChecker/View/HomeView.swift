@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  PolluteChecker
 //
-//  Created by Dương Anh Trần on 25/9/2025.
+//  Created by Dương Anh Trần on 30/9/2025.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct HomeView: View {
     @StateObject var apiFetch = APIFetcher()
     @EnvironmentObject var locationManager: LocationCacher
     
@@ -16,11 +16,13 @@ struct ContentView: View {
             MapView().environmentObject(locationManager)
                 .tabItem {
                     Label("Map", systemImage: "map")
+                        .symbolEffect(.bounce.up.wholeSymbol, options:  .repeat(.periodic(delay: 2.0)))
                 }
             
             SavedLocation().environmentObject(locationManager)
                 .tabItem {
                     Label("Saved Location", systemImage: "list.bullet.clipboard.fill")
+                        .symbolEffect(.bounce.up.wholeSymbol, options:  .repeat(.periodic(delay: 2.0)))
                 }
             
         }
@@ -28,6 +30,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    HomeView()
         .environmentObject(LocationCacher())
 }

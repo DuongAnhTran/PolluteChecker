@@ -13,27 +13,32 @@ import MapKit
 
 struct MapView: View {
     @StateObject private var mapSearch = MapSearcher()
+    @EnvironmentObject var locationManager: LocationCacher
     @State private var queryText = ""
     @State private var queryLat = ""
     @State private var queryLon = ""
     @State private var queryCity = ""
     @State private var locSelect: Bool = false
     @State private var selectedCat: SearchCategory = .randomQuery
+    @State private var isCurrentLoc: Bool = false
     
     var body: some View {
         VStack {
             switch selectedCat {
+                //View for random query (vague search/address search)
                 case .randomQuery:
                     HStack {
                         TextField("Enter location query", text: $queryText, onCommit: {
                             mapSearch.locationSearch(query: queryText)
                             mapSearch.isInitial = false
+                            isCurrentLoc = false
                         })
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         
                         Button(action: {
                             mapSearch.locationSearch(query: queryText)
                             mapSearch.isInitial = false
+                            isCurrentLoc = false
                         }) {
                             HStack {
                                 Text("Search")
@@ -41,62 +46,132 @@ struct MapView: View {
                             }
                             .padding(5)
                         }
+                        .disabled(queryText.isEmpty)
                         .foregroundStyle(.white)
-                        .background(.blue)
+                        .background(queryText.isEmpty ? Color.gray : Color.blue)
                         .cornerRadius(10)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 5)
                     
-                    SearchPickerView(selectedCat: $selectedCat)
-
-                    Map(position: $mapSearch.camPos) {
-                        if let pin = mapSearch.locationPin {
-                            Annotation("Destination", coordinate:pin.coordinate) {
-                                Button(action: {
-                                    locSelect = true
-                                }) {
-                                    Image(systemName: (mapSearch.isInitial ? "location.circle.fill" : "mappin.circle.fill"))
-                                        .font(.title)
-                                        .foregroundStyle(mapSearch.isInitial ? .blue : .red)
-                                }
-                                .sheet(isPresented: $locSelect) {
-                                    NavigationStack {
-                                        LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude)
-                                            .presentationDragIndicator(.visible)
-                                    }
-                                    
-                                }
-                                
-                            }
-                        }
-                    }
-                    .mapStyle(.standard)
-                
-                
-                case .cities:
-                    // View for city search
-                    
-                    SearchPickerView(selectedCat: $selectedCat)
-                    Text("WIP")
                 
                 case .coordination:
                     //View for coordinate search
-                HStack {
-                    TextField("Enter latitude", text: $queryLat)
-                    TextField("Enter longitude", text: $queryLon)
-                    //Button
-                }
+                    HStack {
+                        TextField("Enter latitude", text: $queryLat)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Enter longitude", text: $queryLon)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
+                        Button(action: {
+                            mapSearch.coorSearch(lat: queryLat, lon: queryLon)
+                            mapSearch.isInitial = false
+                            isCurrentLoc = false
+                        }) {
+                            HStack {
+                                Text("Search")
+                                Image(systemName: "magnifyingglass.circle")
+                            }
+                            .padding(5)
+                        }
+                        .disabled(!isValidCoor())
+                        .foregroundStyle(.white)
+                        .background(isValidCoor() ? Color.blue : Color.gray)
+                        .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 5)
+                
+                
+                case .currentLoc:
+                    // View for user loc
+                    Text("User Current Location")
+                        .font(.title)
                     
-                    SearchPickerView(selectedCat: $selectedCat)
-                    Text("WIP")
-                
-                
-                
             }
+            
+            SearchPickerView(selectedCat: $selectedCat)
+            
+            Map(position: $mapSearch.camPos) {
+                if let pin = mapSearch.locationPin {
+                    Annotation((isCurrentLoc ? "Current Position" : "Destination"), coordinate:pin.coordinate) {
+                        Button(action: {
+                            locSelect = true
+                        }) {
+                            Image(systemName: (isCurrentLoc ? "location.circle.fill" : "mappin.circle.fill"))
+                                .font(.title)
+                                .foregroundStyle(isCurrentLoc ? .blue : .red)
+                        }
+                        .sheet(isPresented: $locSelect) {
+                            NavigationStack {
+                                LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude)
+                                    .presentationDragIndicator(.visible)
+                                    .environmentObject(locationManager)
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+            .onAppear {
+                Task {
+                    isCurrentLoc = true
+                    mapSearch.getCurrentLocation()
+                }
+            }
+            .mapStyle(.standard)
         }
-        .onAppear(perform: mapSearch.getCurrentLocation)
+        .onAppear {
+            selectedCat = .randomQuery
+        }
+        .onChange(of: selectedCat) {
+            if (selectedCat == .currentLoc) {
+                isCurrentLoc = true
+                mapSearch.getCurrentLocation()
+            }
+            queryText = ""
+            queryLat = ""
+            queryLon = ""
+        }
     }
+    
+    
+    
+    
+    //Extra func to chekc lat and lon values in the textfields
+    func checkLat(lat: String) -> Bool {
+        if let latitude = Double(lat) {
+            if (latitude > 90 || latitude < -90) {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
+    }
+    
+    func checkLon(lon: String) -> Bool {
+        if let longitude = Double(lon) {
+            if (longitude > 180 || longitude < -180) {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
+    }
+    
+    func isValidCoor() -> Bool {
+        if checkLat(lat: queryLat) && checkLon(lon: queryLon) && !queryLat.isEmpty && !queryLon.isEmpty {
+            return true
+        } else {
+            return false
+        }
+    }
+
 }
 
 
@@ -104,10 +179,10 @@ struct MapView: View {
 
 enum SearchCategory: String, CaseIterable, Identifiable {
     case randomQuery = "Query"
-    case cities = "Cities"
     case coordination = "Coordinate"
+    case currentLoc = "Current Location"
     
-    //Just giving a readable string as id for each case - conforming Identifiable
+    //To conform Identifiable
     var id: String { rawValue }
 }
 
@@ -115,5 +190,6 @@ enum SearchCategory: String, CaseIterable, Identifiable {
 
 #Preview {
     MapView()
+        .environmentObject(LocationCacher())
 }
 

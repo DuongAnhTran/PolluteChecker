@@ -36,10 +36,7 @@ struct DatafieldView: View {
                         Text("\(String(format: "%.2f", minValue(array: valueArray)))")
                             .bold()
                     }
-                    
                     Divider()
-                    
-                    
                     Text("Starts at: \(minTime(valueArray: valueArray, dateArray: dateArray))")
                 }
                 
@@ -51,7 +48,6 @@ struct DatafieldView: View {
                             .bold()
                     }
                     Divider()
-                    
                     Text("Starts at: \(maxTime(valueArray: valueArray, dateArray: dateArray))")
                 }
             }
@@ -64,6 +60,8 @@ struct DatafieldView: View {
         }
     }
     
+    
+    //Extra function:
     func minValue(array: [Float]) -> Float {
         return array.min() ?? 0
     }
@@ -91,6 +89,104 @@ struct DatafieldView: View {
         formatter.dateFormat = "HH:mm"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter.string(from: date)
+    }
+    
+    func categorise(dataTitle: String, value: Float) -> Color{
+        switch dataTitle {
+            case "PM 2.5":
+                if value < 25 {
+                    return Color.green
+                } else if (value >= 25 && value < 50) {
+                    return Color.yellow
+                } else if (value >= 50 && value < 100) {
+                    return Color.orange
+                } else if (value >= 100 && value < 300) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
+                
+            case "Carbon Monoxide (CO)":
+                if value <= 9 {
+                    return Color.green
+                } else if (value > 9 && value <= 50) {
+                    return Color.yellow
+                } else if (value > 50 && value <= 100) {
+                    return Color.orange
+                } else if (value > 100 && value <= 200) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
+                
+            case "Carbon Dioxide (CO₂)":
+                if value <= 1000 {
+                    return Color.green
+                } else if (value > 1000 && value <= 2000) {
+                    return Color.yellow
+                } else if (value > 2000 && value <= 5000) {
+                    return Color.orange
+                } else if (value > 5000 && value <= 30000) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
+                
+            case "Nitrogen Dioxide (NO₂)":
+                if value < 5.36 {
+                    return Color.green
+                } else if (value >= 5.36 && value <= 8) {
+                    return Color.yellow
+                } else if (value > 8 && value <= 12) {
+                    return Color.orange
+                } else if (value > 12 && value <= 16) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
+                
+            case "Sulphur Dioxide (O₂)":
+                if value < 5.025 {
+                    return Color.green
+                } else if (value >= 5.025 && value <= 7.5) {
+                    return Color.yellow
+                } else if (value > 7.5 && value <= 11.25) {
+                    return Color.orange
+                } else if (value > 11.25 && value <= 15) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
+                
+            case "Ozone (O₃)":
+            if value < 6.7 {
+                return Color.green
+            } else if (value >= 6.7 && value <= 10) {
+                return Color.yellow
+            } else if (value > 10 && value <= 15) {
+                return Color.orange
+            } else if (value > 15 && value <= 20) {
+                return Color.red
+            } else {
+                return Color.brown
+            }
+                
+            case "PM 10":
+            if value < 50 {
+                return Color.green
+            } else if (value >= 50 && value <= 100) {
+                return Color.yellow
+            } else if (value > 100 && value <= 200) {
+                return Color.orange
+            } else if (value > 200 && value <= 600) {
+                return Color.red
+            } else {
+                return Color.brown
+            }
+                
+        default:
+            return Color.black
+        }
     }
     
 }

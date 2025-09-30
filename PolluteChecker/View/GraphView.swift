@@ -18,7 +18,7 @@ struct GraphView: View {
     
     var body: some View {
         let graphData = zip(dateArray, valueArray).map {
-            GraphData(dataTypes: label, date: $0.0, value: Float($0.1))
+            GraphData(label: label, date: $0.0, value: Float($0.1))
         }
         Chart(graphData) { point in
             LineMark(

@@ -8,22 +8,65 @@
 
 import SwiftUI
 import Foundation
+import MapKit
 
 struct SavedLocation: View {
-    @StateObject var manager = LocationManager()
+    @EnvironmentObject var locationManager: LocationCacher
     
     var body: some View {
-        Text("\(manager.locationList.count)")
+        NavigationStack {
+            List{
+                ForEach(locationManager.locationList, id: \.id) { location in
+                    NavigationLink {
+                        LocationView(lat: location.lat, lon: location.lon)
+                            .presentationDragIndicator(.visible)
+                            .environmentObject(locationManager)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            Text(location.locationName)
+                                .font(.headline)
+                            Text("Latitude: \(String(format: "%.4f", location.lat)), Longitude: \(String(format: "%.4f", location.lon))")
+                                .font(.subheadline)
+                                .foregroundStyle(.gray)
+                            
+                            
+                            
+                            Map(position: .constant(.region(MKCoordinateRegion(
+                                center: CLLocationCoordinate2D(latitude: location.lat, longitude: location.lon),
+                                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))))
+                            ) {
+                                let locationPin = LocationPin(coordinate: CLLocationCoordinate2D(latitude: location.lat, longitude: location.lon))
+                                Annotation("Current Position", coordinate: locationPin.coordinate) {
+                                    
+                                    Image(systemName: "mappin.circle.fill")
+                                        .font(.title)
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                            .frame(height: 150)
+                            .cornerRadius(10)
+                            .padding(.top, 5)
+                        }
+                    }
+                }
+                .onDelete(perform: locationManager.deleteLocation)
+            }
             .onAppear {
                 Task {
-                    manager.loadLocation()
-                    print("\(manager.locationList.count)")
+                    locationManager.loadLocation()
+                    print("\(locationManager.locationList.count)")
                 }
             }
+            .navigationTitle("Your saved location")
+        }
+        
+        
+            
     }
     
 }
 
 #Preview {
-    SavedLocation(manager: LocationManager())
+    SavedLocation()
+        .environmentObject(LocationCacher())
 }

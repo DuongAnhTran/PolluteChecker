@@ -7,8 +7,11 @@
 
 import Foundation
 
-
 // Weather data model to receive air quality data from open-meteo import
+/**
+    The air quality model will be containing a smaller struct that contains the arrays for each of the
+        air quality criteria (the arrays has 24 items for 24h prediction)
+*/
 struct WeatherData: Codable, Identifiable {
     let hourly: Hourly
     var id = UUID()
