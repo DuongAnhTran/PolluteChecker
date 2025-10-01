@@ -22,6 +22,11 @@ struct HomeView: View {
                 .tabItem {
                     Label("Saved Location", systemImage: "list.bullet.clipboard.fill")
                 }
+            
+            DataExplainView()
+                .tabItem {
+                    Label("Data Explanation", systemImage: "info.circle")
+                }
         }
     }
 }

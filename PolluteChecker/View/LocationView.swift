@@ -152,7 +152,6 @@ struct LocationView: View {
                             .disabled(newLocName.isEmpty || manager.checkNameExist(name: newLocName))
                             
                             Button("Cancel", role: .cancel) {
-                                locationTitle = newLocName
                                 newLocName = ""
                                 isModifying = false
                             }

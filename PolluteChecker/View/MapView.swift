@@ -148,7 +148,7 @@ struct MapView: View {
             queryLon = ""
         }
         .alert("No result was found, or this is an extreme coordinate search. Please move the map around to find your located pin. If no pin was found, please try another search!", isPresented: $isAlert) {
-            Button("Cancel", role: .cancel) {}
+            Button("Close", role: .cancel) {}
          }
     }
     
