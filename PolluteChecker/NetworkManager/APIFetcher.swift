@@ -12,6 +12,7 @@ import Combine
 // Fetching air quality from open-meteo
 
 class APIFetcher: ObservableObject {
+    //Declare a initial. WeatherData object for the class
     @Published var weatherData: WeatherData = .empty
     
     

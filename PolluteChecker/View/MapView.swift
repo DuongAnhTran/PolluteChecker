@@ -21,6 +21,7 @@ struct MapView: View {
     @State private var locSelect: Bool = false
     @State private var selectedCat: SearchCategory = .randomQuery
     @State private var isCurrentLoc: Bool = false
+    @State var isAlert: Bool = false
     
     var body: some View {
         VStack {
@@ -32,6 +33,9 @@ struct MapView: View {
                             mapSearch.locationSearch(query: queryText)
                             mapSearch.isInitial = false
                             isCurrentLoc = false
+                            if mapSearch.locationPin == nil {
+                                isAlert = true
+                            }
                         })
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         
@@ -39,6 +43,9 @@ struct MapView: View {
                             mapSearch.locationSearch(query: queryText)
                             mapSearch.isInitial = false
                             isCurrentLoc = false
+                            if mapSearch.locationPin == nil {
+                                isAlert = true
+                            }
                         }) {
                             HStack {
                                 Text("Search")
@@ -67,6 +74,9 @@ struct MapView: View {
                             mapSearch.coorSearch(lat: queryLat, lon: queryLon)
                             mapSearch.isInitial = false
                             isCurrentLoc = false
+                            if mapSearch.locationPin == nil || mapSearch.locationPin?.coordinate.latitude ?? 86 >= 85 || mapSearch.locationPin?.coordinate.latitude ?? 86 <= -85 || mapSearch.locationPin?.coordinate.longitude ?? 181 >= 180 || mapSearch.locationPin?.coordinate.longitude ?? 181 <= -180 {
+                                isAlert = true
+                            }
                         }) {
                             HStack {
                                 Text("Search")
@@ -134,6 +144,9 @@ struct MapView: View {
             queryLat = ""
             queryLon = ""
         }
+        .alert("No result was found, or this is an extreme coordinate search. Please move the map around to find your located pin. If no pin was found, please try another search!", isPresented: $isAlert) {
+            Button("Cancel", role: .cancel) {}
+         }
     }
     
     

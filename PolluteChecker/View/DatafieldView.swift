@@ -33,8 +33,12 @@ struct DatafieldView: View {
                     HStack(spacing: 0.1) {
                         Text("Min Value: ")
                             
-                        Text("\(String(format: "%.2f", minValue(array: valueArray)))")
+                        Text("\(String(format: "%.2f", minValue(array: valueArray))) \(label)")
                             .bold()
+                            .padding(.trailing, 2)
+                        
+                        Image(systemName: "circle.fill")
+                            .foregroundStyle(categorise(dataTitle: dataTitle, value: minValue(array: valueArray)))
                     }
                     Divider()
                     Text("Starts at: \(minTime(valueArray: valueArray, dateArray: dateArray))")
@@ -44,11 +48,16 @@ struct DatafieldView: View {
                     HStack(spacing: 0.1) {
                         Text("Max Value: ")
                         
-                        Text("\(String(format: "%.2f", maxValue(array: valueArray)))")
+                        Text("\(String(format: "%.2f", maxValue(array: valueArray))) \(label)")
                             .bold()
+                            .padding(.trailing, 2)
+                        
+                        Image(systemName: "circle.fill")
+                            .foregroundStyle(categorise(dataTitle: dataTitle, value: maxValue(array: valueArray)))
                     }
                     Divider()
                     Text("Starts at: \(maxTime(valueArray: valueArray, dateArray: dateArray))")
+                        
                 }
             }
             .padding(.bottom)
@@ -107,13 +116,13 @@ struct DatafieldView: View {
                 }
                 
             case "Carbon Monoxide (CO)":
-                if value <= 9 {
+            if value <= 6900 {
                     return Color.green
-                } else if (value > 9 && value <= 50) {
+                } else if (value > 6900 && value <= 10350) {
                     return Color.yellow
-                } else if (value > 50 && value <= 100) {
+                } else if (value > 10350 && value <= 15525) {
                     return Color.orange
-                } else if (value > 100 && value <= 200) {
+                } else if (value > 15525 && value <= 20700) {
                     return Color.red
                 } else {
                     return Color.brown
@@ -133,43 +142,43 @@ struct DatafieldView: View {
                 }
                 
             case "Nitrogen Dioxide (NO₂)":
-                if value < 5.36 {
+                if value < 101 {
                     return Color.green
-                } else if (value >= 5.36 && value <= 8) {
+                } else if (value >= 101 && value <= 150) {
                     return Color.yellow
-                } else if (value > 8 && value <= 12) {
+                } else if (value > 150 && value <= 225) {
                     return Color.orange
-                } else if (value > 12 && value <= 16) {
+                } else if (value > 225 && value <= 300) {
                     return Color.red
                 } else {
                     return Color.brown
                 }
                 
-            case "Sulphur Dioxide (O₂)":
-                if value < 5.025 {
+            case "Sulphur Dioxide (SO₂)":
+                if value < 134 {
                     return Color.green
-                } else if (value >= 5.025 && value <= 7.5) {
+                } else if (value >= 134 && value <= 200) {
                     return Color.yellow
-                } else if (value > 7.5 && value <= 11.25) {
+                } else if (value > 200 && value <= 300) {
                     return Color.orange
-                } else if (value > 11.25 && value <= 15) {
+                } else if (value > 300 && value <= 400) {
                     return Color.red
                 } else {
                     return Color.brown
                 }
                 
             case "Ozone (O₃)":
-            if value < 6.7 {
-                return Color.green
-            } else if (value >= 6.7 && value <= 10) {
-                return Color.yellow
-            } else if (value > 10 && value <= 15) {
-                return Color.orange
-            } else if (value > 15 && value <= 20) {
-                return Color.red
-            } else {
-                return Color.brown
-            }
+                if value < 134 {
+                    return Color.green
+                } else if (value >= 134 && value <= 200) {
+                    return Color.yellow
+                } else if (value > 200 && value <= 300) {
+                    return Color.orange
+                } else if (value > 300 && value <= 400) {
+                    return Color.red
+                } else {
+                    return Color.brown
+                }
                 
             case "PM 10":
             if value < 50 {

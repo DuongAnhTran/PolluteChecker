@@ -63,7 +63,18 @@ class MapSearcher: ObservableObject {
             return
         }
         self.locationPin = LocationPin(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon))
-        self.camPos = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon), distance: 1000))
+        
+        if lat >= 85 || lon == 180 || lon == -180{
+            self.camPos = MapCameraPosition.region(
+                MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+                    span: MKCoordinateSpan(latitudeDelta: 40.0, longitudeDelta: 40.0)
+                )
+            )
+        } else {
+            self.camPos = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon), distance: 1000))
+        }
+            
     }
     
 }
