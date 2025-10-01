@@ -20,7 +20,7 @@ import Foundation
  */
 struct LocationData: Codable, Identifiable {
     var id = UUID()
-    let locationName: String
+    var locationName: String
     let lat: Double
     let lon: Double
 }

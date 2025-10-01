@@ -13,12 +13,13 @@ import MapKit
 struct SavedLocation: View {
     @EnvironmentObject var locationManager: LocationCacher
     
+    
     var body: some View {
         NavigationStack {
             List{
-                ForEach(locationManager.locationList, id: \.id) { location in
+                ForEach(Array(locationManager.locationList.enumerated()), id: \.element.id) { index, location in
                     NavigationLink {
-                        LocationView(lat: location.lat, lon: location.lon)
+                        LocationView(lat: location.lat, lon: location.lon, locationTitle: location.locationName, locOffset: index)
                             .presentationDragIndicator(.visible)
                             .environmentObject(locationManager)
                     } label: {
@@ -54,7 +55,7 @@ struct SavedLocation: View {
             .onAppear {
                 Task {
                     locationManager.loadLocation()
-                    print("\(locationManager.locationList.count)")
+                    //print("\(locationManager.locationList.count)") (This is for debugging)
                 }
             }
             .navigationTitle("Your saved location")

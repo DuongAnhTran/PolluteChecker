@@ -37,7 +37,10 @@ struct MapView: View {
                                 isAlert = true
                             }
                         })
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
                         
                         Button(action: {
                             mapSearch.locationSearch(query: queryText)
@@ -114,7 +117,7 @@ struct MapView: View {
                         }
                         .sheet(isPresented: $locSelect) {
                             NavigationStack {
-                                LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude)
+                                LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude, locationTitle: "", locOffset: -1)
                                     .presentationDragIndicator(.visible)
                                     .environmentObject(locationManager)
                             }

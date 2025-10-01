@@ -15,6 +15,10 @@ struct LocationView: View {
     @State var lat: Double
     @State var lon: Double
     
+    
+    //Variable to dismiss the sheet
+    @Environment(\.dismiss) var dismiss
+    
     //Arrays to hold fetched data
     @State var dateArray: [Date] = []
     @State var pm25Array: [Float] = []
@@ -24,6 +28,12 @@ struct LocationView: View {
     @State var sulphurArray: [Float] = []
     @State var ozoneArray: [Float] = []
     @State var pm10Array: [Float] = []
+    @State var locationTitle: String
+    @State var isLoading: Bool = false
+    
+    @State var locOffset: Int
+    @State var isModifying: Bool = false
+    @State var newLocName: String = ""
 
     @State var addLoc: Bool = false
     @State var locName: String = ""
@@ -39,25 +49,25 @@ struct LocationView: View {
                 .padding()
                 
                 //Data part for PM 2.5
-                DatafieldView(valueArray: $pm25Array, dateArray: $dateArray, dataTitle: "PM 2.5", graphTitle: "PM 2.5 over time", label: "(µg/m³)", color: Color.blue)
+                DatafieldView(valueArray: $pm25Array, dateArray: $dateArray, dataTitle: "PM 2.5", graphTitle: "PM 2.5 over time", label: "(µg/m³)", color: Color.blue, isLoading: $isLoading)
                 
                 //Data part for carbon monoxide (CO)
-                DatafieldView(valueArray: $carbonMArray, dateArray: $dateArray, dataTitle: "Carbon Monoxide (CO)", graphTitle: "CO over time", label: "(µg/m³)", color: Color.red)
+                DatafieldView(valueArray: $carbonMArray, dateArray: $dateArray, dataTitle: "Carbon Monoxide (CO)", graphTitle: "CO over time", label: "(µg/m³)", color: Color.red, isLoading: $isLoading)
                 
                 //Data part for carbon dioxide (CO₂)
-                DatafieldView(valueArray: $carbonDArray, dateArray: $dateArray, dataTitle: "Carbon Dioxide (CO₂)", graphTitle: "CO₂ over time", label: "(ppm)", color: Color.green)
+                DatafieldView(valueArray: $carbonDArray, dateArray: $dateArray, dataTitle: "Carbon Dioxide (CO₂)", graphTitle: "CO₂ over time", label: "(ppm)", color: Color.green, isLoading: $isLoading)
                 
                 //Data part for nitrogen dioxide (NO₂)
-                DatafieldView(valueArray: $nitroArray, dateArray: $dateArray, dataTitle: "Nitrogen Dioxide (NO₂)", graphTitle: "NO₂ over time", label: "(µg/m³)", color: Color.purple)
+                DatafieldView(valueArray: $nitroArray, dateArray: $dateArray, dataTitle: "Nitrogen Dioxide (NO₂)", graphTitle: "NO₂ over time", label: "(µg/m³)", color: Color.purple, isLoading: $isLoading)
                 
                 //Data part for sulphur dioxide (SO₂)
-                DatafieldView(valueArray: $sulphurArray, dateArray: $dateArray, dataTitle: "Sulphur Dioxide (SO₂)", graphTitle: "SO₂ over time", label: "(µg/m³)", color: Color.pink)
+                DatafieldView(valueArray: $sulphurArray, dateArray: $dateArray, dataTitle: "Sulphur Dioxide (SO₂)", graphTitle: "SO₂ over time", label: "(µg/m³)", color: Color.pink, isLoading: $isLoading)
                 
                 //Data part for ozone (O₃)
-                DatafieldView(valueArray: $ozoneArray, dateArray: $dateArray, dataTitle: "Ozone (O₃)", graphTitle: "O₃ over time", label: "(µg/m³)", color: Color.orange)
+                DatafieldView(valueArray: $ozoneArray, dateArray: $dateArray, dataTitle: "Ozone (O₃)", graphTitle: "O₃ over time", label: "(µg/m³)", color: Color.orange, isLoading: $isLoading)
                 
                 //Data part for PM 10
-                DatafieldView(valueArray: $pm10Array, dateArray: $dateArray, dataTitle: "PM 10", graphTitle: "PM 10 over time", label: "(µg/m³)", color: Color.brown)
+                DatafieldView(valueArray: $pm10Array, dateArray: $dateArray, dataTitle: "PM 10", graphTitle: "PM 10 over time", label: "(µg/m³)", color: Color.brown, isLoading: $isLoading)
                 
                 
                 Button(action: {
@@ -73,6 +83,8 @@ struct LocationView: View {
             }
             .onAppear {
                 Task {
+                    isLoading = true
+                    manager.loadLocation()
                     await fetcher.fetchAirQuality(latitude: lat, longitude: lon)
                     dateArray = fetcher.weatherData.hourly.time
                     pm25Array = fetcher.weatherData.hourly.pm25
@@ -82,34 +94,76 @@ struct LocationView: View {
                     sulphurArray = fetcher.weatherData.hourly.sulphurDioxide
                     ozoneArray = fetcher.weatherData.hourly.ozone
                     pm10Array = fetcher.weatherData.hourly.pm10
+                    isLoading = false
                 }
             }
-            .navigationTitle("Place info")
+            .navigationTitle("\(locationTitle == "" ? "Place Info" : locationTitle)")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    // The plus button on the top right to add location
-                    Button(action: {
-                        addLoc = true
-                    }) {
-                        Image(systemName: "plus")
+                if locationTitle == "" || locOffset == -1 {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        // The plus button on the top right to add location
+                        Button(action: {
+                            addLoc = true
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                        .alert(Text((manager.isPlaceExist(lat: lat, lon: lon) ? "This location already exists. Please check the following location name in your saved locations." : "Please provide a name for this location")), isPresented: $addLoc) {
+                            if (!manager.isPlaceExist(lat: lat, lon: lon)) {
+                                TextField("Please enter a name for this location", text: $locName)
+                                Button("Add") {
+                                    manager.addLocation(location: LocationData(locationName: locName, lat: lat, lon: lon))
+                                    locName = ""
+                                    addLoc = false
+                                    dismiss()
+                                }
+                                .disabled(locName.isEmpty || manager.checkNameExist(name: locName))
+                                
+                                Button("Cancel", role: .cancel) {
+                                    locName = ""
+                                    addLoc = false
+                                }
+                            } else {
+                                Text("\(manager.existingName)")
+                                Button ("Close", role: .cancel) {
+                                    addLoc = false
+                                    locName = ""
+                                }
+                            }
+                        }
+                        .onChange(of: addLoc) { oldValue, newValue in
+                            if manager.isPlaceExist(lat: lat, lon: lon) {
+                                DispatchQueue.main.async {
+                                    manager.storeExistingName(lat: lat, lon: lon)
+                                }
+                            }
+                        }
                     }
-                    .alert("Please provide a name for this location", isPresented: $addLoc) {
-                        TextField("Please enter a name for this location", text: $locName)
-                        Button("Add") {
-                            manager.addLocation(location: LocationData(locationName: locName, lat: lat, lon: lon))
-                            locName = ""
-                            addLoc = false
+                } else {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: {
+                            isModifying = true
+                        }) {
+                            Image(systemName: "pencil.line")
                         }
-                        .disabled(locName.isEmpty)
-                        
-                        Button("Cancel", role: .cancel) {
-                            locName = ""
-                            addLoc = false
+                        .alert("Editing Location Name", isPresented: $isModifying) {
+                            TextField("Enter new name", text: $newLocName)
+                            
+                            Button("Save") {
+                                manager.modifyLocation(at: locOffset, newName: newLocName)
+                                isModifying = false
+                                locationTitle = newLocName
+                                newLocName = ""
+                            }
+                            .disabled(newLocName.isEmpty || manager.checkNameExist(name: newLocName))
+                            
+                            Button("Cancel", role: .cancel) {
+                                locationTitle = newLocName
+                                newLocName = ""
+                                isModifying = false
+                            }
                         }
-                        
                     }
                 }
-                
             }
         }
     }
@@ -126,7 +180,8 @@ struct LocationView: View {
 }
 
 
+//Do not do modify here cuz it will break
 #Preview {
-    LocationView(fetcher: APIFetcher(), lat: -33.8688, lon: 151.2093)
+    LocationView(fetcher: APIFetcher(), lat: -33.8688, lon: 151.2093, locationTitle: "Sydney", locOffset: -1)
         .environmentObject(LocationCacher())
 }

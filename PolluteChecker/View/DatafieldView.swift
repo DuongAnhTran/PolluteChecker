@@ -16,17 +16,23 @@ struct DatafieldView: View {
     var graphTitle: String
     var label: String
     var color: Color
+    @Binding var isLoading: Bool
     
     var body: some View {
         VStack {
             Divider()
             
-            Text("\(dataTitle)")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .padding(.bottom, 1)
-                .font(.title2)
-                .bold()
+            HStack(spacing: 10) {
+                Text("\(dataTitle): Avg: \(String(format: "%.2f", averageValue(array: valueArray)))")
+                    .font(.title3)
+                    .bold()
+                
+                Image(systemName: "circle.fill")
+                    .foregroundStyle(categorise(dataTitle: dataTitle, value: averageValue(array: valueArray)))
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack {
                 HStack {
@@ -65,7 +71,11 @@ struct DatafieldView: View {
             Text("\(graphTitle)")
                 .font(.subheadline)
             
-            GraphView(label: label, dateArray: dateArray, valueArray: valueArray, color: color)
+            if !isLoading {
+                GraphView(label: label, dateArray: dateArray, valueArray: valueArray, color: color)
+            } else {
+                Text("Loading...")
+            }
         }
     }
     
@@ -77,6 +87,11 @@ struct DatafieldView: View {
     
     func maxValue(array: [Float]) -> Float {
         return array.max() ?? 0
+    }
+    
+    
+    func averageValue(array: [Float]) -> Float {
+        return array.reduce(0, +) / Float(array.count)
     }
     
     func maxTime(valueArray: [Float], dateArray: [Date]) -> String {

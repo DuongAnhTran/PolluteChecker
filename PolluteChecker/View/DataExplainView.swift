@@ -14,6 +14,11 @@ struct DataExplainView: View {
             VStack {
                 ScrollView {
                     Divider()
+                    Text("Data Explanation")
+                        .font(.title3)
+                        .bold()
+                        .padding(.bottom, 5)
+                    
                     Text("All data displayed for the air quality forecast of the chosen location is taken from the [Open Meteo API](https://open-meteo.com/en/docs/air-quality-api).")
                     Text("Each component of air quality will be classified as: **Good**, **Fair**, **Poor**, **Very Poor** and **Extremely Poor**.")
                     
@@ -63,23 +68,28 @@ struct DataExplainView: View {
                             Image(systemName: "circle.fill")
                                 .foregroundStyle(Color(.brown))
                             
-                            Text("This indicates extremely high amount of a certain element in the air, outdoor activities are dangerous. Prtotection are needed when outdie")
+                            Text("This indicates extremely high amount of a certain element in the air, outdoor activities are dangerous. Prtotection are needed when outside")
                                 .frame(maxWidth: 300)
                         }
                         .padding(.horizontal)
                     }
                     .padding(.vertical, 5)
+                    
+                    
+                    Divider()
                 }
                 
                 
                 VStack {
                     Spacer()
-                    Text("This is an explaination for the air quality prediction data")
+                    Text("This is an explaination for the air quality prediction data and additional information on the app")
                 }
                 .frame(maxHeight: 70)
             }
-            .navigationTitle("Data Explanation")
+            .navigationTitle("Data Explanation and App Notes")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        
     }
 }
 

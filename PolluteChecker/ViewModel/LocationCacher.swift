@@ -11,6 +11,7 @@ import SwiftUI
 
 class LocationCacher: ObservableObject {
     @Published var locationList: [LocationData] = []
+    @Published var existingName: String = ""
     
     
     func addLocation(location: LocationData) {
@@ -38,10 +39,43 @@ class LocationCacher: ObservableObject {
         }
     }
     
+    func modifyLocation(at index: Int, newName: String) {
+        self.locationList[index].locationName = newName
+        saveLocation()
+    }
+    
     
     func deleteLocation(at offsets: IndexSet) {
         self.loadLocation()
         self.locationList.remove(atOffsets: offsets)
         self.saveLocation()
+    }
+    
+    
+    func isPlaceExist(lat: Double, lon: Double) -> Bool {
+        for location in self.locationList {
+            if location.lat == lat && location.lon == lon  {
+                return true
+            }
+        }
+        return false
+    }
+    
+    func storeExistingName(lat: Double, lon: Double) {
+        for location in self.locationList {
+            if location.lat == lat && location.lon == lon  {
+                self.existingName = location.locationName
+            }
+        }
+    }
+    
+    
+    func checkNameExist(name: String) -> Bool {
+        for location in self.locationList {
+            if location.locationName.lowercased() == name.lowercased()  {
+                return true
+            }
+        }
+        return false
     }
 }
