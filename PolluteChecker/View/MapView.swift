@@ -44,6 +44,7 @@ struct MapView: View {
                     Button(action: {
                         mapSearch.locationSearch(query: queryText)
                         isCurrentLoc = false
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         if mapSearch.locationPin == nil {
                             isAlert = true
                         }
@@ -74,7 +75,8 @@ struct MapView: View {
                     Button(action: {
                         mapSearch.coorSearch(lat: queryLat, lon: queryLon)
                         isCurrentLoc = false
-                        if mapSearch.locationPin == nil || mapSearch.locationPin?.coordinate.latitude ?? 86 >= 85 || mapSearch.locationPin?.coordinate.latitude ?? 86 <= -85 || mapSearch.locationPin?.coordinate.longitude ?? 181 >= 180 || mapSearch.locationPin?.coordinate.longitude ?? 181 <= -180 {
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        if mapSearch.locationPin == nil || mapSearch.locationPin?.coordinate.latitude ?? 86 >= 85 || mapSearch.locationPin?.coordinate.latitude ?? 86 <= -85 || mapSearch.locationPin?.coordinate.longitude ?? 181 > 180 || mapSearch.locationPin?.coordinate.longitude ?? 181 < -180 {
                             isAlert = true
                         }
                     }) {
