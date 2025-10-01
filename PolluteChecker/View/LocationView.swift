@@ -107,7 +107,7 @@ struct LocationView: View {
                         }) {
                             Image(systemName: "plus")
                         }
-                        .alert(Text((manager.isPlaceExist(lat: lat, lon: lon) ? "This location already exists. Please check the following location name in your saved locations." : "Please provide a name for this location")), isPresented: $addLoc) {
+                        .alert(Text((manager.isPlaceExist(lat: lat, lon: lon) ? "This location already exists. Please check the following location name in your saved locations: \(manager.existingName)" : "Please provide a name for this location")), isPresented: $addLoc) {
                             if (!manager.isPlaceExist(lat: lat, lon: lon)) {
                                 TextField("Please enter a name for this location", text: $locName)
                                 Button("Add") {
@@ -123,18 +123,15 @@ struct LocationView: View {
                                     addLoc = false
                                 }
                             } else {
-                                Text("\(manager.existingName)")
                                 Button ("Close", role: .cancel) {
                                     addLoc = false
                                     locName = ""
                                 }
                             }
                         }
-                        .onChange(of: addLoc) { oldValue, newValue in
+                        .onAppear {
                             if manager.isPlaceExist(lat: lat, lon: lon) {
-                                DispatchQueue.main.async {
-                                    manager.storeExistingName(lat: lat, lon: lon)
-                                }
+                                manager.storeExistingName(lat: lat, lon: lon)
                             }
                         }
                     }

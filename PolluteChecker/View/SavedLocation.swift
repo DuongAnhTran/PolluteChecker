@@ -38,7 +38,6 @@ struct SavedLocation: View {
                             ) {
                                 let locationPin = LocationPin(coordinate: CLLocationCoordinate2D(latitude: location.lat, longitude: location.lon))
                                 Annotation("Current Position", coordinate: locationPin.coordinate) {
-                                    
                                     Image(systemName: "mappin.circle.fill")
                                         .font(.title)
                                         .foregroundStyle(.blue)
