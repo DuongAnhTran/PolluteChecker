@@ -12,14 +12,22 @@ import MapKit
 
 struct SavedLocation: View {
     @EnvironmentObject var locationManager: LocationCacher
+    @State var searchText: String = ""
     
+    var filteredLocation: [LocationData] {
+        if searchText.isEmpty {
+            return locationManager.locationList
+        } else {
+            return locationManager.filter(searchText: searchText)
+        }
+    }
     
     var body: some View {
         NavigationStack {
             List{
-                ForEach(Array(locationManager.locationList.enumerated()), id: \.element.id) { index, location in
+                ForEach(filteredLocation, id: \.id) { location in
                     NavigationLink {
-                        LocationView(lat: location.lat, lon: location.lon, locationTitle: location.locationName, locOffset: index)
+                        LocationView(lat: location.lat, lon: location.lon, locationTitle: location.locationName, id: location.id)
                             .presentationDragIndicator(.visible)
                             .environmentObject(locationManager)
                     } label: {
@@ -51,6 +59,7 @@ struct SavedLocation: View {
                 }
                 .onDelete(perform: locationManager.deleteLocation)
             }
+            .searchable(text: $searchText, prompt: "Search saved locations")
             .onAppear {
                 Task {
                     locationManager.loadLocation()

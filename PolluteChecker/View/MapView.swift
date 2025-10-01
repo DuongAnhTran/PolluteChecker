@@ -27,80 +27,77 @@ struct MapView: View {
         VStack {
             switch selectedCat {
                 //View for random query (vague search/address search)
-                case .randomQuery:
-                    HStack {
-                        TextField("Enter location query", text: $queryText, onCommit: {
-                            mapSearch.locationSearch(query: queryText)
-                            mapSearch.isInitial = false
-                            isCurrentLoc = false
-                            if mapSearch.locationPin == nil {
-                                isAlert = true
-                            }
-                        })
-                        .autocorrectionDisabled(true)
-                        .textInputAutocapitalization(.never)
+            case .randomQuery:
+                HStack {
+                    TextField("Enter location query", text: $queryText, onCommit: {
+                        mapSearch.locationSearch(query: queryText)
+                        isCurrentLoc = false
+                        if mapSearch.locationPin == nil {
+                            isAlert = true
+                        }
+                    })
+                    .autocorrectionDisabled(true)
+                    .textInputAutocapitalization(.never)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    
+                    Button(action: {
+                        mapSearch.locationSearch(query: queryText)
+                        isCurrentLoc = false
+                        if mapSearch.locationPin == nil {
+                            isAlert = true
+                        }
+                    }) {
+                        HStack {
+                            Text("Search")
+                            Image(systemName: "magnifyingglass.circle")
+                        }
+                        .padding(5)
+                    }
+                    .disabled(queryText.isEmpty)
+                    .foregroundStyle(.white)
+                    .background(queryText.isEmpty ? Color.gray : Color.blue)
+                    .cornerRadius(10)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 5)
+                
+                
+            case .coordination:
+                //View for coordinate search
+                HStack {
+                    TextField("Enter latitude", text: $queryLat)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        
-                        
-                        Button(action: {
-                            mapSearch.locationSearch(query: queryText)
-                            mapSearch.isInitial = false
-                            isCurrentLoc = false
-                            if mapSearch.locationPin == nil {
-                                isAlert = true
-                            }
-                        }) {
-                            HStack {
-                                Text("Search")
-                                Image(systemName: "magnifyingglass.circle")
-                            }
-                            .padding(5)
-                        }
-                        .disabled(queryText.isEmpty)
-                        .foregroundStyle(.white)
-                        .background(queryText.isEmpty ? Color.gray : Color.blue)
-                        .cornerRadius(10)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 5)
+                    TextField("Enter longitude", text: $queryLon)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                     
-                
-                case .coordination:
-                    //View for coordinate search
-                    HStack {
-                        TextField("Enter latitude", text: $queryLat)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        TextField("Enter longitude", text: $queryLon)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        
-                        Button(action: {
-                            mapSearch.coorSearch(lat: queryLat, lon: queryLon)
-                            mapSearch.isInitial = false
-                            isCurrentLoc = false
-                            if mapSearch.locationPin == nil || mapSearch.locationPin?.coordinate.latitude ?? 86 >= 85 || mapSearch.locationPin?.coordinate.latitude ?? 86 <= -85 || mapSearch.locationPin?.coordinate.longitude ?? 181 >= 180 || mapSearch.locationPin?.coordinate.longitude ?? 181 <= -180 {
-                                isAlert = true
-                            }
-                        }) {
-                            HStack {
-                                Text("Search")
-                                Image(systemName: "magnifyingglass.circle")
-                            }
-                            .padding(5)
+                    Button(action: {
+                        mapSearch.coorSearch(lat: queryLat, lon: queryLon)
+                        isCurrentLoc = false
+                        if mapSearch.locationPin == nil || mapSearch.locationPin?.coordinate.latitude ?? 86 >= 85 || mapSearch.locationPin?.coordinate.latitude ?? 86 <= -85 || mapSearch.locationPin?.coordinate.longitude ?? 181 >= 180 || mapSearch.locationPin?.coordinate.longitude ?? 181 <= -180 {
+                            isAlert = true
                         }
-                        .disabled(!isValidCoor())
-                        .foregroundStyle(.white)
-                        .background(isValidCoor() ? Color.blue : Color.gray)
-                        .cornerRadius(10)
+                    }) {
+                        HStack {
+                            Text("Search")
+                            Image(systemName: "magnifyingglass.circle")
+                        }
+                        .padding(5)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 5)
+                    .disabled(!isValidCoor())
+                    .foregroundStyle(.white)
+                    .background(isValidCoor() ? Color.blue : Color.gray)
+                    .cornerRadius(10)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 5)
                 
                 
-                case .currentLoc:
-                    // View for user loc
-                    Text("User Current Location")
-                        .font(.title)
-                    
+            case .currentLoc:
+                // View for user loc
+                Text("User Current Location")
+                    .font(.title)
+                
             }
             
             SearchPickerView(selectedCat: $selectedCat)
@@ -117,7 +114,7 @@ struct MapView: View {
                         }
                         .sheet(isPresented: $locSelect) {
                             NavigationStack {
-                                LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude, locationTitle: "", locOffset: -1)
+                                LocationView(lat: pin.coordinate.latitude, lon: pin.coordinate.longitude, locationTitle: "", id: UUID.sentinel)
                                     .presentationDragIndicator(.visible)
                                     .environmentObject(locationManager)
                             }
@@ -137,6 +134,9 @@ struct MapView: View {
         }
         .onAppear {
             selectedCat = .randomQuery
+            queryText = ""
+            queryLat = ""
+            queryLon = ""
         }
         .onChange(of: selectedCat) {
             if (selectedCat == .currentLoc) {

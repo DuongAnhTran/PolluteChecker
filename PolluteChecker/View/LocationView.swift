@@ -31,7 +31,7 @@ struct LocationView: View {
     @State var locationTitle: String
     @State var isLoading: Bool = false
     
-    @State var locOffset: Int
+    @State var id: UUID
     @State var isModifying: Bool = false
     @State var newLocName: String = ""
 
@@ -99,11 +99,14 @@ struct LocationView: View {
             }
             .navigationTitle("\(locationTitle == "" ? "Place Info" : locationTitle)")
             .toolbar {
-                if locationTitle == "" || locOffset == -1 {
+                if locationTitle == "" || id == UUID.sentinel {
                     ToolbarItem(placement: .topBarTrailing) {
                         // The plus button on the top right to add location
                         Button(action: {
                             addLoc = true
+                            if manager.isPlaceExist(lat: lat, lon: lon) {
+                                manager.storeExistingName(lat: lat, lon: lon)
+                            }
                         }) {
                             Image(systemName: "plus")
                         }
@@ -129,11 +132,6 @@ struct LocationView: View {
                                 }
                             }
                         }
-                        .onAppear {
-                            if manager.isPlaceExist(lat: lat, lon: lon) {
-                                manager.storeExistingName(lat: lat, lon: lon)
-                            }
-                        }
                     }
                 } else {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -146,7 +144,7 @@ struct LocationView: View {
                             TextField("Enter new name", text: $newLocName)
                             
                             Button("Save") {
-                                manager.modifyLocation(at: locOffset, newName: newLocName)
+                                manager.modifyLocation(id: id, newName: newLocName)
                                 isModifying = false
                                 locationTitle = newLocName
                                 newLocName = ""
@@ -179,6 +177,6 @@ struct LocationView: View {
 
 //Do not do modify here cuz it will break
 #Preview {
-    LocationView(fetcher: APIFetcher(), lat: -33.8688, lon: 151.2093, locationTitle: "Sydney", locOffset: -1)
-        .environmentObject(LocationCacher())
+    LocationView(fetcher: APIFetcher(), lat: -33.8688, lon: 151.2093, locationTitle: "Sydney", id: UUID.sentinel)
+            .environmentObject(LocationCacher())
 }

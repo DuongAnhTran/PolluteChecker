@@ -8,26 +8,32 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var apiFetch = APIFetcher()
     @EnvironmentObject var locationManager: LocationCacher
+    @State var isLoading = false
     
     var body: some View {
-        TabView {
-            MapView().environmentObject(locationManager)
-                .tabItem {
-                    Label("Map", systemImage: "map")
+        Group {
+            if isLoading {
+                VStack {
+                    ProgressView("App is Loading. Please wait...")
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .padding()
                 }
-            
-            SavedLocation().environmentObject(locationManager)
-                .tabItem {
-                    Label("Saved Location", systemImage: "list.bullet.clipboard.fill")
-                }
-            
+            } else {
+                HomeView()
+                    .environmentObject(locationManager)
+            }
+        }
+        .onAppear {
+            isLoading = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                isLoading = false
+            }
         }
     }
 }
 
 #Preview {
-    ContentView()
+    HomeView()
         .environmentObject(LocationCacher())
 }

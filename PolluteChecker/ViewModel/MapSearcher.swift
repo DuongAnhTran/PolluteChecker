@@ -20,7 +20,6 @@ class MapSearcher: ObservableObject {
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
     )
-    @Published var isInitial: Bool = true
     @Published var locationPin: LocationPin? = nil
 
     

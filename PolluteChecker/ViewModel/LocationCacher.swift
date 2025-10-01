@@ -39,9 +39,13 @@ class LocationCacher: ObservableObject {
         }
     }
     
-    func modifyLocation(at index: Int, newName: String) {
-        self.locationList[index].locationName = newName
-        saveLocation()
+    func modifyLocation(id: UUID, newName: String) {
+        if let index = self.locationList.firstIndex(where: { $0.id == id }) {
+            self.locationList[index].locationName = newName
+            saveLocation()
+        } else {
+            print("not found")
+        }
     }
     
     
@@ -77,5 +81,16 @@ class LocationCacher: ObservableObject {
             }
         }
         return false
+    }
+    
+    
+    func filter(searchText: String) -> [LocationData] {
+        var filteredLocation: [LocationData] = []
+        for location in self.locationList {
+            if (location.locationName.lowercased().contains(searchText.lowercased())) == true {
+                filteredLocation.append(location)
+            }
+        }
+        return filteredLocation
     }
 }

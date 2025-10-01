@@ -24,3 +24,8 @@ struct LocationData: Codable, Identifiable {
     let lat: Double
     let lon: Double
 }
+
+
+extension UUID {
+    static let sentinel = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+}

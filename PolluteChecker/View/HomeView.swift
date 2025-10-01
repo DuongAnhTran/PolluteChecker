@@ -16,15 +16,12 @@ struct HomeView: View {
             MapView().environmentObject(locationManager)
                 .tabItem {
                     Label("Map", systemImage: "map")
-                        .symbolEffect(.bounce.up.wholeSymbol, options:  .repeat(.periodic(delay: 2.0)))
                 }
             
             SavedLocation().environmentObject(locationManager)
                 .tabItem {
                     Label("Saved Location", systemImage: "list.bullet.clipboard.fill")
-                        .symbolEffect(.bounce.up.wholeSymbol, options:  .repeat(.periodic(delay: 2.0)))
                 }
-            
         }
     }
 }
