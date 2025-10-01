@@ -28,7 +28,7 @@ struct WeatherData: Codable, Identifiable {
     }
 }
 
-
+//An extension to dtermine an empty version of WeatherData (for convinience when initialising objects of this struct)
 extension WeatherData {
     static var empty: WeatherData {
         .init(hourly: .init(time: [], pm25: [], carbonMonoxide: [], carbonDioxide: [], nitrogenDioxide: [], sulphurDioxide: [], ozone: [], pm10: []))

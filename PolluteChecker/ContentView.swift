@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+//Currently up to mapview
 struct ContentView: View {
     @EnvironmentObject var locationManager: LocationCacher
     @State var isLoading = false

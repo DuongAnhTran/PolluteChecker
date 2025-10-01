@@ -25,7 +25,8 @@ struct LocationData: Codable, Identifiable {
     let lon: Double
 }
 
-
+//An extension for data type UUID (This is used to creat a sentinel value)
+///This sentinel value will determine which version of the **LocationView** will be shown. If sentinel value is passed, the app will be showing the search result version (allows adding new location), if a unique UUID is passed, it will display the saved location version (only allow modification)
 extension UUID {
     static let sentinel = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
 }

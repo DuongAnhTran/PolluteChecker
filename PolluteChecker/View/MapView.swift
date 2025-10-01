@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MapKit
 
-//initial map and pin for the
+//This is 
 
 struct MapView: View {
     @StateObject private var mapSearch = MapSearcher()

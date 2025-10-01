@@ -9,6 +9,17 @@ import SwiftUI
 import Foundation
 import Charts
 
+///This view is a childView of **LocationView** that shows the forecasted information of the air quality
+///Will be called multiple time for multiple air quality element of the forecast
+/**
+    Receive from LocationView:
+        - Data array for each air quality element (CO2, SO2, etc)
+        - The array of time (Contains time from 00:00 to 23:00)
+        - dataTitle == Name of the current element
+        - graphTitle == title of the line graph
+        - label == label of the y-axis (x-axis label is the same for every graph)
+        - color == color for the line in line graph
+ */
 struct DatafieldView: View {
     @Binding var valueArray: [Float]
     @Binding var dateArray: [Date]
@@ -21,7 +32,7 @@ struct DatafieldView: View {
     var body: some View {
         VStack {
             Divider()
-            
+            //Title for each of the air element
             HStack(spacing: 10) {
                 Text("\(dataTitle): Avg: \(String(format: "%.2f", averageValue(array: valueArray)))")
                     .font(.title3)
@@ -34,7 +45,9 @@ struct DatafieldView: View {
             .padding(.vertical, 5)
             .frame(maxWidth: .infinity, alignment: .leading)
             
+            //Min and max value of the element and what time does this occur
             VStack {
+                //Min value and time occur
                 HStack {
                     HStack(spacing: 0.1) {
                         Text("Min Value: ")
@@ -43,6 +56,7 @@ struct DatafieldView: View {
                             .bold()
                             .padding(.trailing, 2)
                         
+                        //A colored circle indicating the safetiness of the element's value to human health
                         Image(systemName: "circle.fill")
                             .foregroundStyle(categorise(dataTitle: dataTitle, value: minValue(array: valueArray)))
                     }
@@ -50,6 +64,7 @@ struct DatafieldView: View {
                     Text("Starts at: \(minTime(valueArray: valueArray, dateArray: dateArray))")
                 }
                 
+                //Max value and time occur
                 HStack {
                     HStack(spacing: 0.1) {
                         Text("Max Value: ")
@@ -68,32 +83,36 @@ struct DatafieldView: View {
             }
             .padding(.bottom)
             
+            //Graph title and graph (will have indicator when loading)
             Text("\(graphTitle)")
                 .font(.subheadline)
             
             if !isLoading {
                 GraphView(label: label, dateArray: dateArray, valueArray: valueArray, color: color)
             } else {
-                Text("Loading...")
+                Text("**Loading...**")
             }
         }
     }
     
     
-    //Extra function:
+    //Extra function section:
+    //Find min value
     func minValue(array: [Float]) -> Float {
         return array.min() ?? 0
     }
     
+    //Find max value
     func maxValue(array: [Float]) -> Float {
         return array.max() ?? 0
     }
     
-    
+    //Find average value
     func averageValue(array: [Float]) -> Float {
         return array.reduce(0, +) / Float(array.count)
     }
     
+    //Find time when max value occur
     func maxTime(valueArray: [Float], dateArray: [Date]) -> String {
         guard let index = valueArray.enumerated().max(by: { $0.element < $1.element })?.offset else {
             return ""
@@ -101,6 +120,7 @@ struct DatafieldView: View {
         return formatting(dateArray[index])
     }
     
+    //Find time when min value occur
     func minTime(valueArray: [Float], dateArray: [Date]) -> String {
         guard let index = valueArray.enumerated().min(by: { $0.element < $1.element })?.offset else {
             return ""
@@ -108,6 +128,7 @@ struct DatafieldView: View {
         return formatting(dateArray[index])
     }
     
+    //Format for date to show time in HH:mm format
     func formatting(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -115,6 +136,12 @@ struct DatafieldView: View {
         return formatter.string(from: date)
     }
     
+    
+    /*A function to manually categorise data based on information from:
+        (https://www.co2meter.com/en-au/blogs/news/carbon-dioxide-indoor-levels-chart?srsltid=AfmBOorbhDCjzRIA-vT0CbPk4djeLpNS0KyCKH-zV_ackgMONl8W3Bwy)
+        AND
+        (https://www.airquality.nsw.gov.au/health-advice/air-quality-categories)
+     */
     func categorise(dataTitle: String, value: Float) -> Color{
         switch dataTitle {
             case "PM 2.5":

@@ -43,10 +43,14 @@ class APIFetcher: ObservableObject {
             //This is in case the flatbuffer did not work properly (low chance this will be called - 2nd option)
             guard let jsonURL = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=\(latitude)&longitude=\(longitude)&hourly=pm2_5,carbon_monoxide,carbon_dioxide,nitrogen_dioxide,sulphur_dioxide,ozone,pm10&timezone=auto&forecast_days=1&format=json") else { return }
 
+            //Do-catch to avoid unexpected error
             do {
+                //Grab data from the declared json url and decode json
                 let (data, _) = try await URLSession.shared.data(from: jsonURL)
                 let decoded = try JSONDecoder().decode(WeatherData.self, from: data)
-
+                
+                //Assigning the published variable with the found data from the API
+                //The API will be returning data in a list of array, each position is corresponding to each of the fetched data
                 weatherData = WeatherData(
                     hourly: .init(
                         time: decoded.hourly.time,
