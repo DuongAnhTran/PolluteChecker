@@ -9,6 +9,7 @@ import Foundation
 
 import SwiftUI
 
+//This is anextra view to show the category picker for the MapView
 struct SearchPickerView: View {
     @Binding var selectedCat: SearchCategory
     

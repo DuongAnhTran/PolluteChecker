@@ -10,10 +10,19 @@ import SwiftUI
 import Foundation
 import MapKit
 
+///SavedLocation -> LocationView
+
+//The view that show all saved location that is saved by the user
 struct SavedLocation: View {
+    
+    //Receive env object from parent view(s)
     @EnvironmentObject var locationManager: LocationCacher
+    
+    //A variable to observe the filter search textfield
     @State var searchText: String = ""
     
+    //A varibale that holds a sub-set of LocationData, this will be used to apply filter
+    //If there is input, filter the saved data, if there is not, show all of the saved locations
     var filteredLocation: [LocationData] {
         if searchText.isEmpty {
             return locationManager.locationList
@@ -24,8 +33,10 @@ struct SavedLocation: View {
     
     var body: some View {
         NavigationStack {
+            //The list that will show user saved locations
             List{
                 ForEach(filteredLocation, id: \.id) { location in
+                    //Each list item has a link that gopes into the location's air quality forecast info
                     NavigationLink {
                         LocationView(lat: location.lat, lon: location.lon, locationTitle: location.locationName, id: location.id)
                             .presentationDragIndicator(.visible)
@@ -39,7 +50,7 @@ struct SavedLocation: View {
                                 .foregroundStyle(.gray)
                             
                             
-                            
+                            //A preview map in each of the list item to display where the location is
                             Map(position: .constant(.region(MKCoordinateRegion(
                                 center: CLLocationCoordinate2D(latitude: location.lat, longitude: location.lon),
                                 span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))))
@@ -57,9 +68,12 @@ struct SavedLocation: View {
                         }
                     }
                 }
+                //Saved location can be dleted with a swipe
                 .onDelete(perform: locationManager.deleteLocation)
             }
+            //Allow the list to be searchable/filterable
             .searchable(text: $searchText, prompt: "Search saved locations")
+            //When the view appear, load the information first
             .onAppear {
                 Task {
                     locationManager.loadLocation()

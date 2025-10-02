@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-//Currently up to mapview
+//This will trigger when the app is run. This is a minor loading screen when the app is opened
 struct ContentView: View {
+    //Getting the env object fed to the app
     @EnvironmentObject var locationManager: LocationCacher
     @State var isLoading = false
     
@@ -25,6 +26,7 @@ struct ContentView: View {
                     .environmentObject(locationManager)
             }
         }
+        //When the app first opened, the time for this loading screen is 1 second
         .onAppear {
             isLoading = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
